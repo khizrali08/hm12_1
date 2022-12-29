@@ -1,0 +1,24 @@
+- hosts: all
+  become: yes
+
+  vars:
+   age: 1w
+   paths: /var/log/
+
+  tasks:
+    - name: Show files older than {{ age }}
+      find:
+        path: '{{ paths }}'
+        age: '{{ age }}'
+        recurse: yes
+      register: result
+    
+    - name: Print
+      debug: 
+        var: result
+
+    - name: remove registered files
+      file:
+        path: "{{ item.path }}"
+        state: absent
+      with_items: "{{ result.files }}"
